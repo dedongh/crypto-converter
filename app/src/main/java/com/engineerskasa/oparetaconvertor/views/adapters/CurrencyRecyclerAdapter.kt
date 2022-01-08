@@ -1,7 +1,6 @@
 package com.engineerskasa.oparetaconvertor.views.adapters
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -12,24 +11,31 @@ import androidx.recyclerview.widget.RecyclerView
 import com.engineerskasa.oparetaconvertor.R
 import com.engineerskasa.oparetaconvertor.databinding.ConverterListItemLayoutBinding
 import com.engineerskasa.oparetaconvertor.model.OfflineCurrency
-import timber.log.Timber
-import java.util.ArrayList
 
 class CurrencyRecyclerAdapter(val context: Context) :
     ListAdapter<OfflineCurrency, CurrencyRecyclerAdapter.CurrencyViewHolder>(DIFF_UTIL_CALLBACK) {
 
     class CurrencyViewHolder(private val binding: ConverterListItemLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(_currency: OfflineCurrency, position: Int, context: Context,) {
+        fun bind(_currency: OfflineCurrency, position: Int, context: Context, adapter: CurrencyRecyclerAdapter) {
             binding.apply {
                 currency = _currency
                 currencyPrice.text =  _currency.price.toString()
             }
             if (position % 2 == 0) {
-                binding.parentLayout.setBackgroundColor(ContextCompat.getColor(
-                    context,
-                    R.color.grey
-                ))
+                binding.parentLayout.setBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.grey
+                    )
+                )
+            } else {
+                binding.parentLayout.setBackgroundColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.white
+                    )
+                )
             }
         }
     }
@@ -40,14 +46,14 @@ class CurrencyRecyclerAdapter(val context: Context) :
                 oldItem: OfflineCurrency,
                 newItem: OfflineCurrency
             ): Boolean =
-                oldItem.id == newItem.id
+                oldItem == newItem
 
 
             override fun areContentsTheSame(
                 oldItem: OfflineCurrency,
                 newItem: OfflineCurrency
             ): Boolean =
-                oldItem == newItem
+                oldItem.id == newItem.id
 
 
         }
@@ -72,7 +78,7 @@ class CurrencyRecyclerAdapter(val context: Context) :
         position: Int
     ) {
         val currency = getItem(position)
-        holder.bind(currency, position, context)
+        holder.bind(currency, position, context, this)
     }
 
     fun setCurrencies(currencies: List<OfflineCurrency>) {

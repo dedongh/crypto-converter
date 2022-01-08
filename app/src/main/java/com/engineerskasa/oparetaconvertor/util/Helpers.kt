@@ -11,11 +11,14 @@ import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.IOException
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
+import kotlin.math.abs
 
 fun getTimeStamp(): String {
     return DateTimeFormatter
@@ -29,16 +32,19 @@ fun getTimeToSync(startTime: String, endTime: String): Pair<Long, Long> {
     var initialTime = LocalTime.parse(startTime)
     val finalTime = LocalTime.parse(endTime)
 
-    val hours = initialTime.until(finalTime, ChronoUnit.HOURS)
+   /* val hours = initialTime.until(finalTime, ChronoUnit.HOURS)
     initialTime = initialTime.plusHours(hours)
 
     val minutes = initialTime.until(finalTime, ChronoUnit.MINUTES)
     initialTime = initialTime.plusMinutes(minutes)
 
-    val seconds = initialTime.until(finalTime, ChronoUnit.SECONDS)
+    val seconds = initialTime.until(finalTime, ChronoUnit.SECONDS)*/
+    val minutes = ChronoUnit.MINUTES.between(initialTime, finalTime)
+    val hours = ChronoUnit.HOURS.between(initialTime, finalTime)
 
     return Pair(hours, minutes)
 }
+
 
 fun showErrorMessage(view: View, e: Throwable) {
     var message = ""

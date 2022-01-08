@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "last_sync")
 data class LastSync(
-    @PrimaryKey(autoGenerate = false)
-    var id: Long = 1,
+    @PrimaryKey
+    var id: String = "",
     @ColumnInfo(name = "last_updated")
     var lastUpdated: String? = null,
 )

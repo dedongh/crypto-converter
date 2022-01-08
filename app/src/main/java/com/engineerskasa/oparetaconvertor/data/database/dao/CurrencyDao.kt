@@ -14,9 +14,12 @@ interface CurrencyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveListOfCurrency(offlineCurrency: List<OfflineCurrency>)
 
-    @Query("select * from currency order by symbol asc")
-    suspend fun getOfflineCurrencies(): List<OfflineCurrency>
+    @Query("select * from currency where currency = :currency order by symbol asc")
+    suspend fun getOfflineCurrencies(currency: String): List<OfflineCurrency>
 
-    @Query("select count(*) from currency")
-    suspend fun getCountOfCurrencies(): Int
+    @Query("select count(*) from currency where currency = :currency")
+    suspend fun getCountOfCurrencies(currency: String): Int
+
+    @Query("delete from currency where currency = :currency")
+    suspend fun deleteCurrencies(currency: String)
 }

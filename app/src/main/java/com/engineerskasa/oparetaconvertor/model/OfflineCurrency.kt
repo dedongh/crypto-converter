@@ -15,4 +15,5 @@ data class OfflineCurrency(
     var slug: String? = null,
     @ColumnInfo(name = "last_updated")
     var lastUpdated: String? = null,
+    var currency: String? = null,
 )

@@ -14,6 +14,6 @@ interface LastSyncDao {
     @Query("select * from last_sync")
     suspend fun getLastSync(): LastSync
 
-    @Query("select count(*) from last_sync")
-    suspend fun getCountOfSync(): Int
+    @Query("select count(*) from last_sync where id = :currency")
+    suspend fun getCountOfSync(currency: String): Int
 }

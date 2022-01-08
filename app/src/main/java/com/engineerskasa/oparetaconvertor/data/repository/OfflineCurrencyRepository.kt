@@ -14,13 +14,15 @@ class OfflineCurrencyRepository @Inject constructor(
 
     suspend fun insertListOfCurrencies(currency: List<OfflineCurrency>) = currencyDao.saveListOfCurrency(currency)
 
-    suspend fun getCountOfCurrencies(): Int = currencyDao.getCountOfCurrencies()
+    suspend fun getCountOfCurrencies(currency: String): Int = currencyDao.getCountOfCurrencies(currency)
 
-    suspend fun fetchCurrenciesFromDB(): List<OfflineCurrency> = currencyDao.getOfflineCurrencies()
+    suspend fun deleteCurrencies(currency: String) = currencyDao.deleteCurrencies(currency)
+
+    suspend fun fetchCurrenciesFromDB(currency: String): List<OfflineCurrency> = currencyDao.getOfflineCurrencies(currency)
 
     suspend fun saveLastSync(lastSync: LastSync) = lastSyncDao.saveLastSync(lastSync)
 
     suspend fun getLastSync(): LastSync = lastSyncDao.getLastSync()
 
-    suspend fun getCountOfSync():Int = lastSyncDao.getCountOfSync()
+    suspend fun getCountOfSync(currency: String):Int = lastSyncDao.getCountOfSync(currency)
 }

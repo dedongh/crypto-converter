@@ -2,10 +2,9 @@ package com.engineerskasa.oparetaconvertor.views.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
+import androidx.core.widget.doOnTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.engineerskasa.oparetaconvertor.R
@@ -15,7 +14,6 @@ import com.engineerskasa.oparetaconvertor.viewmodel.CurrencyViewModel
 import com.engineerskasa.oparetaconvertor.views.adapters.CurrencyRecyclerAdapter
 import com.engineerskasa.oparetaconvertor.views.dialogs.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @AndroidEntryPoint
@@ -70,6 +68,13 @@ class MainActivity : AppCompatActivity() {
         binding.converterRecyclerview.apply {
             layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
             adapter = currencyAdapter
+        }
+
+        binding.amount.doOnTextChanged { text, _, _, _ ->
+            if (text.toString().isNotEmpty())
+                viewModel.convertAmount(text.toString().toDouble())
+            else
+                viewModel.convertAmount(1.0)
         }
     }
 }

@@ -39,6 +39,8 @@ class CurrencyViewModel @Inject constructor(
     val currencies: LiveData<List<OfflineCurrency>>
         get() = _currencies
 
+    var currencyList = ArrayList<OfflineCurrency>()
+
     private val compositeDisposable by lazy { CompositeDisposable() }
 
     init {
@@ -47,8 +49,7 @@ class CurrencyViewModel @Inject constructor(
 
     fun getCurrencyDataSource(currency: String) {
         viewModelScope.launch {
-            val count = offlineCurrencyRepository.getCountOfCurrencies()
-            Timber.e("COUNT ==> $count")
+            val count = offlineCurrencyRepository.getCountOfCurrencies(currency)
             if (count == 0) {
                 getOnlineCurrencies(currency)
             } else {
@@ -61,18 +62,21 @@ class CurrencyViewModel @Inject constructor(
         var hours = 0L
         var minutes = 0L
         viewModelScope.launch {
-            val count = offlineCurrencyRepository.getCountOfSync()
+            val count = offlineCurrencyRepository.getCountOfSync(currency)
             if (count != 0) {
                 val syncedTime = offlineCurrencyRepository.getLastSync().lastUpdated
                 val syncInterval = getTimeToSync(syncedTime!!, getTimeStamp())
                 hours = syncInterval.first
                 minutes = syncInterval.second
             }
+            Timber.e("hours ==> $hours minutes ==> $minutes")
             if (count == 0 || hours > 0 || minutes > 1) {
                 getOnlineCurrencies(currency)
             } else {
-                val currencies = offlineCurrencyRepository.fetchCurrenciesFromDB()
+                currencyList.clear()
+                val currencies = offlineCurrencyRepository.fetchCurrenciesFromDB(currency)
                 _currencies.postValue(currencies)
+                currencyList.addAll(currencies)
             }
         }
     }
@@ -103,17 +107,21 @@ class CurrencyViewModel @Inject constructor(
                         val offlineCurrency = OfflineCurrency()
                         offlineCurrency.name = currency.name
                         offlineCurrency.symbol = currency.symbol
-                        offlineCurrency.price = price
+                        offlineCurrency.price = String.format("%.5f", price).toDouble()
                         offlineCurrency.slug = currency.slug
                         offlineCurrency.lastUpdated = currency.lastUpdated
+                        offlineCurrency.currency = convert
                         list.add(offlineCurrency)
                     }
                     _responses.postValue("Currencies updated")
                     viewModelScope.launch {
+                        currencyList.clear()
+                        offlineCurrencyRepository.deleteCurrencies(convert)
                         offlineCurrencyRepository.insertListOfCurrencies(list)
-                        offlineCurrencyRepository.saveLastSync(LastSync(1, getTimeStamp()))
-                        val allCurrencies = offlineCurrencyRepository.fetchCurrenciesFromDB()
+                        offlineCurrencyRepository.saveLastSync(LastSync(convert, getTimeStamp()))
+                        val allCurrencies = offlineCurrencyRepository.fetchCurrenciesFromDB(convert)
                         _currencies.postValue(allCurrencies)
+                        currencyList.addAll(allCurrencies)
                     }
 
                 }, {
@@ -122,6 +130,13 @@ class CurrencyViewModel @Inject constructor(
                     Timber.e("ERROR ===> ${it.message}")
                 })
         )
+    }
+
+    fun convertAmount(amount: Double) {
+        val filtered = currencyList.map { result ->
+            result.copy(price =  String.format("%.5f", amount / result.price!!).toDouble())
+        }
+        _currencies.postValue(filtered)
     }
 
     override fun onCleared() {
