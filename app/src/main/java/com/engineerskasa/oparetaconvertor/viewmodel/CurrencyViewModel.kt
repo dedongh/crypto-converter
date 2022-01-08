@@ -59,8 +59,9 @@ class CurrencyViewModel @Inject constructor(
     }
 
     fun getOfflineCurrencies(currency: String) {
-        var hours = 0L
-        var minutes = 0L
+        var hours = 0
+        var minutes = 0
+        var seconds = 0
         viewModelScope.launch {
             val count = offlineCurrencyRepository.getCountOfSync(currency)
             if (count != 0) {
@@ -68,8 +69,9 @@ class CurrencyViewModel @Inject constructor(
                 val syncInterval = getTimeToSync(syncedTime!!, getTimeStamp())
                 hours = syncInterval.first
                 minutes = syncInterval.second
+                seconds = syncInterval.third
             }
-            Timber.e("hours ==> $hours minutes ==> $minutes")
+            //Timber.e("hours ==> $hours minutes ==> $minutes seconds ==> $seconds")
             if (count == 0 || hours > 0 || minutes > 1) {
                 getOnlineCurrencies(currency)
             } else {

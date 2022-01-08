@@ -27,22 +27,18 @@ fun getTimeStamp(): String {
         .format(Instant.now())
 }
 
-fun getTimeToSync(startTime: String, endTime: String): Pair<Long, Long> {
-
-    var initialTime = LocalTime.parse(startTime)
-    val finalTime = LocalTime.parse(endTime)
-
-   /* val hours = initialTime.until(finalTime, ChronoUnit.HOURS)
-    initialTime = initialTime.plusHours(hours)
-
-    val minutes = initialTime.until(finalTime, ChronoUnit.MINUTES)
-    initialTime = initialTime.plusMinutes(minutes)
-
-    val seconds = initialTime.until(finalTime, ChronoUnit.SECONDS)*/
-    val minutes = ChronoUnit.MINUTES.between(initialTime, finalTime)
-    val hours = ChronoUnit.HOURS.between(initialTime, finalTime)
-
-    return Pair(hours, minutes)
+fun getTimeToSync(startTime: String, endTime: String): Triple<Int, Int, Int> {
+    val simpleDateFormat = SimpleDateFormat("HH:mm:ss")
+    val startDate = simpleDateFormat.parse(startTime)
+    val endDate = simpleDateFormat.parse(endTime)
+    val diff: Long = abs(endDate.time - startDate.time)
+    var timeInSeconds = (diff / 1000).toInt()
+    val hours = timeInSeconds / 3600
+    timeInSeconds -= (hours * 3600)
+    val minutes = timeInSeconds / 60
+    timeInSeconds -= (minutes * 3600)
+    val seconds = timeInSeconds
+    return Triple(hours, minutes, seconds)
 }
 
 
